@@ -1,0 +1,39 @@
+//imports
+@use "../global/breakpoints" as b;
+@import "./variables";
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Gilroy", sans-serif;
+  font-weight: 500;
+}
+
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  // max-height: 100vh;
+  overflow-x: hidden;
+  /* fallback to clip */
+  overflow-x: clip;
+  scroll-behavior: smooth;
+}
+
+
+/* scroll bar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  // background: white;
+}
+
+::-webkit-scrollbar-track {
+  // box-shadow: inset 0 0 5px #1013201d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  // background: #b1b1b1;
+  border-radius: 10px;
+}
