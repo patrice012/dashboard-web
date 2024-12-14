@@ -5,8 +5,6 @@ import {
   Package2,
   Settings,
   LogOut,
-  ChartArea,
-  ListOrdered,
 } from "lucide-react";
 import { AlertLogoutDialog } from "../auth/LogoutDialog";
 
