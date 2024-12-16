@@ -12,7 +12,6 @@ import { NotFound } from "./pages/404/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { DashBoardResetPassword } from "./pages/Dashboard/ResetPassword/ResetPassword";
-// import { SettingsPage } from "./pages/Settings/Settings";
 import EditAccountPage from "./pages/Dashboard/EditAccount/EditAccount";
 import { ThemeProvider } from "@/components/theme/themeProvider";
 
@@ -34,7 +33,6 @@ const App = () => {
                   element={<DashBoardResetPassword />}
                 />
                 <Route path="/edit-account" element={<EditAccountPage />} />
-                {/* <Route path="/settings" element={<SettingsPage />} /> */}
 
                 {/* auth pages */}
                 <Route path="/auth/login" element={<Login />} />

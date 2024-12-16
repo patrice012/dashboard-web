@@ -59,10 +59,6 @@ const StepTwo = ({
             placeholder="Enter your 2FA code"
             {...register("factorCode", {
               required: "2FA Code is required",
-              pattern: {
-                value: /^[0-9]{6}$/,
-                message: "Please enter a valid 6-digit code",
-              },
             })}
           />
           {errors.factorCode && (

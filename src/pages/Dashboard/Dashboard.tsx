@@ -20,17 +20,18 @@ export const description =
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 // import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import postReq from "@/helpers/postReq";
+import { useQuery } from "@tanstack/react-query";
 // import { debounce } from "@/helpers/request";
 
-// import { NotFoundData } from "@/components/request/NotFoundData";
-// import { ErrorRequest } from "@/components/request/ErrorRequest";
-// import { TwoFactorType } from "./type";
-// import { CardUI } from "@/components/dashboard/Card";
+import { NotFoundData } from "@/components/request/NotFoundData";
+import { ErrorRequest } from "@/components/request/ErrorRequest";
+import { CardProps, CardUI } from "@/components/dashboard/Card";
 // import { cardData } from "@/data/cardData";
 
 export function Dashboard() {
   const [user] = useCurrentUser();
-  // const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1);
   // const [searchTerms, setSearchTerms] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -52,6 +53,34 @@ export function Dashboard() {
   // const handleSearchValueChange = (value: string) => {
   //   debouncedSearch(value);
   // };
+
+  async function getAllFactorCode() {
+    try {
+      const response = await postReq({
+        data: {
+          uid: user?.uid || "",
+          page: page,
+          perPage: 10,
+          search: "",
+        },
+        url: "/api/twoFactor/get-all",
+      });
+
+      if (response?.status === 200) {
+        return response.json();
+      } else return {};
+    } catch (e) {
+      console.log(e, "error getCompaigns");
+    }
+  }
+
+  const getAllTwoFactorQuery = useQuery({
+    queryKey: ["get-all-twoFactors", page],
+    queryFn: getAllFactorCode,
+    enabled: !!user?.uid,
+  });
+
+  console.log(getAllTwoFactorQuery, "getAllTwoFactorQuery");
 
   return (
     <DashboardLayout>
@@ -75,23 +104,21 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* <div className="relative w-full ml-auto flex-1 md:grow-0">
-          <Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search compaigns..."
-            className="w-full rounded-lg bg-background pl-8 h-11"
-            onChange={(e) => {
-              handleSearchValueChange(e.target.value);
-            }}
-          />
-        </div> */}
+        {getAllTwoFactorQuery.isSuccess ? (
+          getAllTwoFactorQuery.data?.data.length > 0 ? (
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 [@media(min-width:2000px)]:grid-cols-4 place-items-center">
+              {getAllTwoFactorQuery.data?.data.map(
+                (item: CardProps, index: number) => (
+                  <CardUI key={index} {...item} />
+                )
+              )}
+            </div>
+          ) : (
+            <NotFoundData />
+          )
+        ) : null}
 
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 [@media(min-width:2000px)]:grid-cols-4 place-items-center">
-          {/* {cardData.map((card, index) => (
-            <CardUI key={index} {...card} />
-          ))} */}
-        </div>
+        {getAllTwoFactorQuery.isError ? <ErrorRequest /> : null}
       </div>
     </DashboardLayout>
   );
