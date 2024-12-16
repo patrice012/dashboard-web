@@ -78,9 +78,9 @@ export function Dashboard() {
         </div>
 
         {getAllTwoFactorQuery.isSuccess ? (
-          getAllTwoFactorQuery.data?.data.length > 0 ? (
+          getAllTwoFactorQuery.data?.data?.length > 0 ? (
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 [@media(min-width:2000px)]:grid-cols-4 place-items-center">
-              {getAllTwoFactorQuery.data?.data.map(
+              {getAllTwoFactorQuery.data?.data?.map(
                 (item: CardProps, index: number) => (
                   <CardUI key={index} {...item} />
                 )
