@@ -15,7 +15,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DesktopNavBar, MobileNavBar } from "@/components/navBar/NavItems";
 import { AlertLogoutDialog } from "@/components/auth/LogoutDialog";
-import { ModeToggle } from "../theme/modeToggle";
+// import { ModeToggle } from "../theme/modeToggle";
 import { FirebaseAuth as auth } from "@/firebase/config";
 
 import { ReactNode } from "react";
@@ -74,7 +74,7 @@ export function DashboardLayout({
                 <h1 className="text-lg font-bold md:text-2xl">App</h1>
               </div>
               <div className="flex items-center justify-center gap-3">
-                <ModeToggle />
+                {/* <ModeToggle /> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button

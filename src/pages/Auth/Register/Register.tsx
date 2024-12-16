@@ -15,7 +15,7 @@ import { FirebaseAuth as auth } from "@/firebase/config";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonLoading } from "@/components/ui/loadingButton";
 import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
-import { GoogleAuth } from "../GoogleAuth";
+// import { GoogleAuth } from "../GoogleAuth";
 import { saveCredentials } from "@/firebase/saveCredentials";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -179,7 +179,7 @@ export function Register() {
                   Create an account
                 </Button>
               )}
-              <GoogleAuth text="Sign up with Google" />
+              {/* <GoogleAuth text="Sign up with Google" /> */}
             </div>
           </form>
           <div className="mt-4 text-center text-sm">

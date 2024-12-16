@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // import {
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 // } from "@/components/ui/pagination";
 
 // import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { DashboardLayout } from "@/components/dashboard/Layout";
 
 import { NewTwoFactorCodeDialog } from "@/components/dashboard/NewTwoFactorCode";
@@ -20,21 +20,21 @@ export const description =
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 // import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { debounce } from "@/helpers/request";
+// import { debounce } from "@/helpers/request";
 
 // import { NotFoundData } from "@/components/request/NotFoundData";
 // import { ErrorRequest } from "@/components/request/ErrorRequest";
 // import { TwoFactorType } from "./type";
-import { CardUI } from "@/components/dashboard/Card";
-import { cardData } from "@/data/cardData";
+// import { CardUI } from "@/components/dashboard/Card";
+// import { cardData } from "@/data/cardData";
 
 export function Dashboard() {
   const [user] = useCurrentUser();
-  const [page, setPage] = useState(1);
-  const [searchTerms, setSearchTerms] = useState("");
+  // const [page, setPage] = useState(1);
+  // const [searchTerms, setSearchTerms] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log(page, searchTerms, isLoading);
+  console.log(isLoading);
 
   useEffect(() => {
     if (user) {
@@ -42,16 +42,16 @@ export function Dashboard() {
     }
   }, [user]);
 
-  const [debouncedSearch] = useState(() =>
-    debounce((value: string) => {
-      setSearchTerms(value);
-      setPage(1);
-    }, 500)
-  );
+  // const [debouncedSearch] = useState(() =>
+  //   debounce((value: string) => {
+  //     setSearchTerms(value);
+  //     setPage(1);
+  //   }, 500)
+  // );
 
-  const handleSearchValueChange = (value: string) => {
-    debouncedSearch(value);
-  };
+  // const handleSearchValueChange = (value: string) => {
+  //   debouncedSearch(value);
+  // };
 
   return (
     <DashboardLayout>
@@ -75,7 +75,7 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="relative w-full ml-auto flex-1 md:grow-0">
+        {/* <div className="relative w-full ml-auto flex-1 md:grow-0">
           <Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
@@ -85,12 +85,12 @@ export function Dashboard() {
               handleSearchValueChange(e.target.value);
             }}
           />
-        </div>
+        </div> */}
 
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 [@media(min-width:2000px)]:grid-cols-4 place-items-center">
-          {cardData.map((card, index) => (
+          {/* {cardData.map((card, index) => (
             <CardUI key={index} {...card} />
-          ))}
+          ))} */}
         </div>
       </div>
     </DashboardLayout>

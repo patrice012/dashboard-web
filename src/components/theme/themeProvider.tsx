@@ -18,7 +18,8 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
 };
 
-export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+export const ThemeProviderContext =
+  createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
@@ -33,19 +34,20 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark");
+    // root.classList.remove("light", "dark");
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+    // if (theme === "system") {
+    //   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+    //     .matches
+    //     ? "dark"
+    //     : "light";
 
-      root.classList.add(systemTheme);
-      return;
-    }
+    //   root.classList.add(systemTheme);
+    //   return;
+    // }
 
-    root.classList.add(theme);
+    // root.classList.add(theme);
+    root.classList.add("light");
   }, [theme]);
 
   const value = {
@@ -62,5 +64,3 @@ export function ThemeProvider({
     </ThemeProviderContext.Provider>
   );
 }
-
-

@@ -15,7 +15,7 @@ import { FirebaseAuth as auth } from "@/firebase/config";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonLoading } from "@/components/ui/loadingButton";
-import { GoogleAuth } from "../GoogleAuth";
+// import { GoogleAuth } from "../GoogleAuth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -155,7 +155,7 @@ export function Login() {
               </Button>
             )}
 
-            <GoogleAuth text="Login with Google" />
+            {/* <GoogleAuth text="Login with Google" /> */}
           </form>
 
           <div className="mt-4 text-center text-sm">
