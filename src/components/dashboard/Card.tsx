@@ -8,8 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatDate } from "@/helpers/formatDate";
-import { Pencil } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
+import { EditTwoFactorCodeDialog } from "./EditTwoFactorCode";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { RemoveItemDialog } from "./RemoveItem";
 
 export type CardProps = {
   createdAt: string;
@@ -30,8 +39,6 @@ export function CardUI({
 }: CardProps & { className?: string }) {
   // const { mainBg, lighterBg } = statusColors(category) || {};
 
-  console.log(updatedAt, email, factorCode, _id);
-
   return (
     <Card className={cn("w-[390px] shadow-lg relative", className)} {...props}>
       {/* Header */}
@@ -44,7 +51,38 @@ export function CardUI({
         </div>
         <CardTitle className="text-[1.1rem] font-bold mt-0">{email}</CardTitle>
       </CardHeader>
-      <Pencil size={16} className="absolute top-3 right-3 bg-transparent shadow-none" />
+
+      <div className="absolute top-1 right-2 bg-transparent shadow-none cursor-pointer flex items-center gap-1">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-haspopup="true" size="icon" variant="ghost">
+              <EllipsisVertical className="h-4 w-4" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <EditTwoFactorCodeDialog
+                twoFactor={{ createdAt, updatedAt, email, factorCode, _id }}
+              >
+                <DropdownMenuLabel className="cursor-pointer px-4 font-[500] hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-sm">
+                  Edit
+                </DropdownMenuLabel>
+              </EditTwoFactorCodeDialog>
+
+              <RemoveItemDialog
+                id={_id}
+                url={"/api/twoFactor/delete"}
+                queryKey="get-all-twoFactors"
+              >
+                <DropdownMenuLabel className="cursor-pointer px-4 font-[500] hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-sm">
+                  Delete
+                </DropdownMenuLabel>
+              </RemoveItemDialog>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       {/* <CardContent className="pb-4">
         <p className="text-gray-600 dark:text-slate-100 text-sm leading-relaxed line-clamp-2 ">

@@ -1,7 +1,11 @@
 export type TwoFactorType = {
   _id?: string;
-  uid: string;
+  uid?: string;
   email: string;
   factorCode: string;
-  password: string;
+  password?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
+
+

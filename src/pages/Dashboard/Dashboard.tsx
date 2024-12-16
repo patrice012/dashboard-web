@@ -1,38 +1,24 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// import {
-//   Pagination,
-//   PaginationContent,
-//   PaginationEllipsis,
-//   PaginationItem,
-// } from "@/components/ui/pagination";
-
-// import { Card, CardContent, CardFooter } from "@/components/ui/card";
-// import { Input } from "@/components/ui/input";
 import { DashboardLayout } from "@/components/dashboard/Layout";
 
-import { NewTwoFactorCodeDialog } from "@/components/dashboard/NewTwoFactorCode";
-// import postReq from "@/helpers/postReq";
+import { CreateTwoFactorCodeDialog } from "@/components/dashboard/NewTwoFactorCode";
 export const description =
   "A products dashboard with a sidebar navigation and a main content area. The dashboard has a header with a search input and a user menu. The sidebar has a logo, navigation links, and a card with a call to action. The main content area shows an empty state with a call to action.";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-// import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import postReq from "@/helpers/postReq";
 import { useQuery } from "@tanstack/react-query";
-// import { debounce } from "@/helpers/request";
 
 import { NotFoundData } from "@/components/request/NotFoundData";
 import { ErrorRequest } from "@/components/request/ErrorRequest";
 import { CardProps, CardUI } from "@/components/dashboard/Card";
-// import { cardData } from "@/data/cardData";
+import { CardSkeleton } from "@/components/dashboard/CardSkeleton";
 
 export function Dashboard() {
   const [user] = useCurrentUser();
-  const [page, setPage] = useState(1);
-  // const [searchTerms, setSearchTerms] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   console.log(isLoading);
@@ -43,23 +29,12 @@ export function Dashboard() {
     }
   }, [user]);
 
-  // const [debouncedSearch] = useState(() =>
-  //   debounce((value: string) => {
-  //     setSearchTerms(value);
-  //     setPage(1);
-  //   }, 500)
-  // );
-
-  // const handleSearchValueChange = (value: string) => {
-  //   debouncedSearch(value);
-  // };
-
   async function getAllFactorCode() {
     try {
       const response = await postReq({
         data: {
           uid: user?.uid || "",
-          page: page,
+          page: 1,
           perPage: 10,
           search: "",
         },
@@ -75,12 +50,10 @@ export function Dashboard() {
   }
 
   const getAllTwoFactorQuery = useQuery({
-    queryKey: ["get-all-twoFactors", page],
+    queryKey: ["get-all-twoFactors", 1],
     queryFn: getAllFactorCode,
     enabled: !!user?.uid,
   });
-
-  console.log(getAllTwoFactorQuery, "getAllTwoFactorQuery");
 
   return (
     <DashboardLayout>
@@ -93,14 +66,14 @@ export function Dashboard() {
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
               </p>
             </div>
-            <NewTwoFactorCodeDialog>
+            <CreateTwoFactorCodeDialog>
               <Button size="lg" className=" flex-row gap-2 items-center">
                 <Plus className="h-4 w-4" />
                 <span className=" text-[15px] font-semibold sr-only sm:not-sr-only sm:whitespace-nowrap">
                   Create new
                 </span>
               </Button>
-            </NewTwoFactorCodeDialog>
+            </CreateTwoFactorCodeDialog>
           </div>
         </div>
 
@@ -116,6 +89,14 @@ export function Dashboard() {
           ) : (
             <NotFoundData />
           )
+        ) : null}
+
+        {getAllTwoFactorQuery.isLoading || getAllTwoFactorQuery.isRefetching ? (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 [@media(min-width:2000px)]:grid-cols-4 place-items-center">
+            {Array.from({ length: 6 }).map((_, index: number) => (
+              <CardSkeleton key={index} />
+            ))}
+          </div>
         ) : null}
 
         {getAllTwoFactorQuery.isError ? <ErrorRequest /> : null}

@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import postReq from "@/helpers/postReq";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function RemoveItemDialog({
   children,
@@ -22,18 +23,21 @@ export function RemoveItemDialog({
   url,
   redirectUrl,
   refetch,
+  queryKey = "",
 }: {
   children: ReactNode;
   id: string;
   url: string;
   redirectUrl?: string;
   refetch?: () => void;
+  queryKey?: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [user] = useCurrentUser();
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleDeletion = async () => {
     try {
@@ -52,10 +56,14 @@ export function RemoveItemDialog({
         });
         setOpen(false);
 
-        if (redirectUrl) {
-          navigate(redirectUrl);
-        } else if (refetch) {
+        if (refetch) {
           refetch();
+        } else if (queryKey) {
+          queryClient.invalidateQueries({
+            queryKey: [queryKey, 1],
+          });
+        } else if (redirectUrl) {
+          navigate(redirectUrl);
         } else {
           navigate("/");
         }
