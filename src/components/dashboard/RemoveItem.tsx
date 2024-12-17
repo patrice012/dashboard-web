@@ -75,7 +75,7 @@ export function RemoveItemDialog({
         setOpen(true);
       }
     } catch (e) {
-      console.log(e, "error getCompaigns");
+      console.log(e, "error twoFactor");
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",

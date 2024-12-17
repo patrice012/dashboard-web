@@ -19,6 +19,7 @@ import { ButtonLoading } from "@/components/ui/loadingButton";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { saveCredentials } from "@/firebase/saveCredentials";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").min(1, "Email is required"),
@@ -52,10 +53,27 @@ export function Login() {
       const credentials = await loginWithCredentials(data.email, data.password);
 
       if (credentials) {
-        toast({
-          title: "Login successfully",
+        const req = {
+          uid: credentials.uid,
+          email: credentials.email,
+          name: credentials.email,
+        };
+
+        const response = await saveCredentials({
+          data: req,
+          url: "/api/user/create",
         });
-        navigate("/");
+
+        if (response?.ok || response?.status === 201) {
+          toast({
+            title: "Login successfully",
+          });
+          navigate("/");
+        } else {
+          toast({
+            title: "Something went wrong, Try again!",
+          });
+        }
       } else {
         toast({
           variant: "destructive",

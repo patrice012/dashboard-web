@@ -45,7 +45,7 @@ export function Dashboard() {
         return response.json();
       } else return {};
     } catch (e) {
-      console.log(e, "error getCompaigns");
+      console.log(e, "error twoFactor");
     }
   }
 
@@ -91,7 +91,7 @@ export function Dashboard() {
           )
         ) : null}
 
-        {getAllTwoFactorQuery.isLoading || getAllTwoFactorQuery.isRefetching ? (
+        {getAllTwoFactorQuery.isLoading ? (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 [@media(min-width:2000px)]:grid-cols-4 place-items-center">
             {Array.from({ length: 6 }).map((_, index: number) => (
               <CardSkeleton key={index} />

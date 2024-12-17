@@ -102,6 +102,7 @@ export function EditTwoFactorCodeDialog({
           ...twoFactor,
           ...formData,
           ...data,
+          uid: user?.uid || "",
         };
 
         const response = await postReq({
