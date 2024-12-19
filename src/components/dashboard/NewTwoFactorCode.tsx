@@ -6,12 +6,12 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { ButtonLoading } from "@/components/ui/loadingButton";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import postReq from "@/helpers/postReq";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -39,16 +39,14 @@ export function CreateTwoFactorCodeDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isHidden, setIsHidden] = useState(true);
-  const [formData, setFormData] = useState<{
-    email: string;
-    password: string;
-    factorCode: string;
-    uid: string;
-  }>({
+  const [enableQuery, setEnableQuery] = useState(false);
+
+  const [newFactorCode, setNewFactorCode] = useState({
     email: "",
-    password: "",
     factorCode: "",
     uid: user?.uid || "",
+    _id: "",
+    status: "",
   });
 
   // Step One Form
@@ -56,7 +54,10 @@ export function CreateTwoFactorCodeDialog({
     register: registerStepOne,
     handleSubmit: handleSubmitStepOne,
     reset: stepOneFormReset,
-    formState: { errors: errorsStepOne },
+    formState: {
+      errors: errorsStepOne,
+      isSubmitSuccessful: isFormOneSubmitSuccessful,
+    },
     trigger: triggerStepOne,
   } = useForm<StepOneFormData>();
 
@@ -75,22 +76,10 @@ export function CreateTwoFactorCodeDialog({
     const isValid = await triggerStepOne();
 
     if (isValid) {
-      setFormData((prev) => ({ ...prev, ...data }));
-      setCurrentStep(2);
-    }
-  };
-
-  // Handle final form submission
-  const handleStepTwoSubmit = async (data: StepTwoFormData) => {
-    // Trigger validation for step two
-    const isValid = await triggerStepTwo();
-
-    if (isValid) {
       try {
         setIsLoading(true);
 
         const submitData = {
-          ...formData,
           ...data,
         };
 
@@ -103,18 +92,60 @@ export function CreateTwoFactorCodeDialog({
           toast({
             title: "Something went wrong, Try again!",
           });
+          setEnableQuery(false);
+          setIsLoading(false);
           return;
         }
 
+        const reqData = await response.json();
+        setNewFactorCode(reqData?.data);
+      } catch (error) {
+        const err = error as Error;
+        const errorMsg = err.message;
+
         toast({
-          title: "2 Factor Code created successfully",
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: errorMsg || "There was a problem with your request.",
         });
 
-        setOpen(false);
+        setEnableQuery(false);
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Handle final form submission
+  const handleStepTwoSubmit = async (data: StepTwoFormData) => {
+    // Trigger validation for step two
+    const isValid = await triggerStepTwo();
+
+    if (isValid) {
+      try {
+        setIsLoading(true);
+
+        const response = await postReq({
+          data: { ...newFactorCode, ...data, uid: user?.uid || "" },
+          url: "/api/twoFactor/update",
+        });
+
+        if (!response?.ok) {
+          toast({
+            title: "Something went wrong, Try again!",
+          });
+          setEnableQuery(false);
+          setIsLoading(false);
+          return;
+        }
+
+        const reqData = await response.json();
+        setNewFactorCode(reqData?.data);
         stepOneFormReset();
         stepTwoFormReset();
         setCurrentStep(1);
-
+        setOpen(false);
+        toast({ title: "Login successfully" });
+        setIsLoading(false);
         queryClient.invalidateQueries({
           queryKey: ["get-all-twoFactors", 1],
         });
@@ -127,11 +158,99 @@ export function CreateTwoFactorCodeDialog({
           title: "Uh oh! Something went wrong.",
           description: errorMsg || "There was a problem with your request.",
         });
-      } finally {
+
+        setEnableQuery(false);
         setIsLoading(false);
       }
     }
   };
+
+  async function getFactorCode() {
+    try {
+      const response = await postReq({
+        data: {
+          uid: user?.uid || "",
+          _id: newFactorCode._id,
+        },
+        url: "/api/twoFactor/get",
+      });
+
+      console.log(response, "response");
+
+      if (response?.status === 200) {
+        return response.json();
+      } else return {};
+    } catch (e) {
+      console.log(e, "error getFactorCode");
+      setEnableQuery(false);
+      setIsLoading(false);
+    }
+  }
+
+  const getFactorCodeQuery = useQuery({
+    queryKey: ["get-factorCode", user?.uid, newFactorCode._id],
+    queryFn: getFactorCode,
+    enabled: enableQuery || isFormOneSubmitSuccessful,
+    refetchInterval: 2 * 1000,
+  });
+
+  useEffect(() => {
+    const queryState = getFactorCodeQuery.data?.status;
+    const isUserReady = Boolean(user?.uid && newFactorCode._id);
+
+    const handleQueryStateChange = () => {
+      switch (queryState) {
+        case "emailAndPassword":
+          setEnableQuery(true);
+          break;
+        case "hasOTP":
+          setEnableQuery(!isUserReady);
+          break;
+        case "success":
+          setEnableQuery(false);
+          break;
+        default:
+          break;
+      }
+    };
+
+    handleQueryStateChange();
+  }, [getFactorCodeQuery.data?.status, user?.uid, newFactorCode._id]);
+
+  useEffect(() => {
+    const queryState = getFactorCodeQuery.data?.status;
+
+    const handleStepChange = () => {
+      if (!queryState) return;
+
+      if (queryState === "hasOTP") {
+        handleStepHasOTP();
+      } else if (queryState === "success") {
+        handleStepSuccess();
+      }
+    };
+
+    const handleStepHasOTP = () => {
+      stepOneFormReset();
+      setCurrentStep(2);
+      toast({ title: "Provide the latest 2FA Code" });
+      setIsLoading(false);
+    };
+
+    const handleStepSuccess = () => {
+      stepOneFormReset();
+      stepTwoFormReset();
+      setCurrentStep(1);
+      setOpen(false);
+      toast({ title: "Login successfully" });
+      setIsLoading(false);
+      queryClient.invalidateQueries({
+        queryKey: ["get-all-twoFactors", 1],
+      });
+    };
+
+    handleStepChange();
+  }, [getFactorCodeQuery.data?.status]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
