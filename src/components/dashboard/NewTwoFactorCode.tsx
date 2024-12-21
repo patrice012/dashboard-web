@@ -40,6 +40,7 @@ export function CreateTwoFactorCodeDialog({
   const [currentStep, setCurrentStep] = useState(1);
   const [isHidden, setIsHidden] = useState(true);
   const [enableQuery, setEnableQuery] = useState(false);
+  const MAX_OTP_WAITING_TIME = 50000;
 
   const [newFactorCode, setNewFactorCode] = useState({
     email: "",
@@ -220,14 +221,31 @@ export function CreateTwoFactorCodeDialog({
   useEffect(() => {
     const queryState = getFactorCodeQuery.data?.status;
 
+    let timeout: NodeJS.Timeout | null = null;
     const handleStepChange = () => {
       if (!queryState) return;
 
       if (queryState === "hasOTP") {
         handleStepHasOTP();
+        timeout = handleMaxTimeCheck();
       } else if (queryState === "success") {
         handleStepSuccess();
+        if (timeout) {
+          clearTimeout(timeout);
+        }
       }
+    };
+
+    const handleMaxTimeCheck = () => {
+      const timeout = setTimeout(() => {
+        setEnableQuery(false);
+        setCurrentStep(1);
+        setOpen(false);
+        toast({ title: "Request take too long time!" });
+        setIsLoading(false);
+      }, MAX_OTP_WAITING_TIME);
+
+      return timeout;
     };
 
     const handleStepHasOTP = () => {

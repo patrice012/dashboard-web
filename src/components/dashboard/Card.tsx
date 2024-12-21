@@ -19,6 +19,9 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { RemoveItemDialog } from "./RemoveItem";
+import postReq from "@/helpers/postReq";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useToast } from "@/hooks/use-toast";
 
 export type CardProps = {
   createdAt: string;
@@ -38,6 +41,33 @@ export function CardUI({
   ...props
 }: CardProps & { className?: string }) {
   // const { mainBg, lighterBg } = statusColors(category) || {};
+
+  const [user] = useCurrentUser();
+  const { toast } = useToast();
+
+  const handleApiLogin = async () => {
+    try {
+      const response = await postReq({
+        data: {
+          uid: user?.uid || "",
+          id: _id,
+        },
+        url: "/api/twoFactor/api-login",
+      });
+
+      if (response?.status === 200) {
+        toast({
+          title: "Login successfully",
+        });
+      }
+    } catch (e) {
+      console.log(e, "error api login");
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+      });
+    }
+  };
 
   return (
     <Card className={cn("w-[390px] shadow-lg relative", className)} {...props}>
@@ -79,6 +109,13 @@ export function CardUI({
                   Delete
                 </DropdownMenuLabel>
               </RemoveItemDialog>
+
+              <DropdownMenuLabel
+                onClick={handleApiLogin}
+                className="cursor-pointer px-4 font-[500] hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-sm"
+              >
+                Login
+              </DropdownMenuLabel>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

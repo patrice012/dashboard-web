@@ -33,8 +33,8 @@ export function RemoveItemDialog({
   queryKey?: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [user] = useCurrentUser();
   const [open, setOpen] = useState(false);
+  const [user] = useCurrentUser();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
